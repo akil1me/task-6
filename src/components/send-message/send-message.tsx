@@ -16,31 +16,33 @@ export const SendMessage: React.FC = () => {
   const [sending, setSending] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { user } = useSelector((state: RootState) => state.user);
-  const { messages } = useSelector((state: RootState) => state.messages);
   const dispatch = useDispatch();
 
-  const onFinish = useCallback(({ recipient, title, body }: Val) => {
-    const message = {
-      sender: user,
-      recipient,
-      title,
-      body,
-    };
-    setSending(true);
-    socket.emit("post", message);
-    setSending(false);
-    setIsModalOpen(false);
+  const onFinish = useCallback(
+    ({ recipient, title, body }: Val) => {
+      const message = {
+        sender: user,
+        recipient,
+        title,
+        body,
+      };
+      setSending(true);
+      socket.emit("post", message);
+      setSending(false);
+      setIsModalOpen(false);
 
-    messageApi.success("Message delivered");
+      messageApi.success("Message delivered");
 
-    socket.on("error", (err) => {
-      console.log(err);
-      messageApi.error("error");
-    });
-  }, []);
+      socket.on("error", (err) => {
+        console.log(err);
+        messageApi.error("error");
+      });
+    },
+    [socket]
+  );
 
   useEffect(() => {
-    socket.on("receive_post", (msj: DataType) => {
+    const recive_post = (msj: DataType) => {
       if (msj) {
         if (msj.recipient === user) {
           dispatch(messagesActions.setAddMessage(msj));
@@ -48,12 +50,17 @@ export const SendMessage: React.FC = () => {
             message: msj.sender,
             description: msj.title,
             placement: "bottomRight",
+            onClick() {
+              dispatch(messagesActions.setOpenModal(true));
+            },
           });
         }
       }
 
       console.log(msj);
-    });
+    };
+
+    socket.on("receive_post", recive_post);
   }, [socket, user, dispatch]);
 
   return (

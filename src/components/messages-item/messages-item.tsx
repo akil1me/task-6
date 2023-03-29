@@ -1,6 +1,7 @@
 import { Avatar, List, Modal } from "antd";
 import { useState } from "react";
-import { DataType } from "../../store";
+import { DataType, RootState, messagesActions } from "../../store";
+import { useDispatch, useSelector } from "react-redux";
 
 type MessagesItemProps = {
   message: DataType;
@@ -11,13 +12,13 @@ export const MessagesItem: React.FC<MessagesItemProps> = ({
   message,
   user,
 }) => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
+  const { openModal } = useSelector((state: RootState) => state.messages);
+  const dispatch = useDispatch();
   return (
     <>
       <List.Item
         className="hover:opacity-75 transition-opacity cursor-pointer"
-        onClick={() => setIsModalOpen(true)}
+        onClick={() => dispatch(messagesActions.setOpenModal(true))}
       >
         <List.Item.Meta
           avatar={
@@ -39,9 +40,9 @@ export const MessagesItem: React.FC<MessagesItemProps> = ({
 
       <Modal
         title={message.title}
-        open={isModalOpen}
+        open={openModal}
         footer={[]}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={() => dispatch(messagesActions.setOpenModal(false))}
       >
         <div className="relative">
           <p>{message.body}</p>

@@ -10,10 +10,12 @@ export type DataType = {
 };
 type UserSliceStates = {
   messages: DataType[];
+  openModal: boolean;
 };
 
 const initialState: UserSliceStates = {
   messages: [],
+  openModal: false,
 };
 
 export const { reducer: messagesReducer, actions: messagesActions } =
@@ -27,6 +29,9 @@ export const { reducer: messagesReducer, actions: messagesActions } =
 
       setAddMessage(state, { payload }: PayloadAction<DataType>) {
         state.messages = [...state.messages, payload];
+      },
+      setOpenModal(state, { payload }: PayloadAction<boolean>) {
+        state.openModal = payload;
       },
     },
   });
